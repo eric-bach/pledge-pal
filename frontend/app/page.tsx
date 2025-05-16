@@ -66,14 +66,8 @@ export default function Home() {
         <div className='text-center'>
           <h2 className='text-2xl font-semibold text-gray-900 mb-4'>Join the Leaderboard</h2>
           <div className='bg-white p-6 rounded-lg shadow-lg inline-block'>
-            <Image
-              src={`https://images.unsplash.com/photo-1739179418349-f62f722d7e27?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzfHx8ZW58MHx8fHx8`}
-              alt='QR Code to join'
-              width={200}
-              height={200}
-              className='mx-auto'
-            />
-            <p className='mt-4 text-sm text-gray-600'>Scan to make your pledge</p>
+            <Image src='/code.jpg' alt='QR Code to join' width={200} height={200} className='mx-auto' />
+            <p className='mt-4 text-sm text-gray-600'>Scan to start contributing</p>
           </div>
         </div>
       </div>
