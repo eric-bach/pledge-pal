@@ -15,11 +15,9 @@ export default function Home() {
 
   useEffect(() => {
     async function handleConnect() {
-      console.log('Connecting');
-
       return (await events.connect('/pledges/channel')).subscribe({
         next: (data) => {
-          console.log('Received data:', data.event.data);
+          //console.log('Received data:', data.event.data);
           setMessages((prevMessages) => {
             const existingIndex = prevMessages.findIndex((msg) => msg.uuid === data.event.data.uuid);
             if (existingIndex >= 0) {
