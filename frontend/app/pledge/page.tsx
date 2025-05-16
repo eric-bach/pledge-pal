@@ -150,7 +150,7 @@ export default function Pledge() {
     <div className='relative min-h-screen bg-gradient-to-b from-purple-100 to-blue-100 overflow-hidden'>
       {/* Score Display */}
       <div className='fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50'>
-        <h2 className='text-xl font-bold text-gray-900'>Score</h2>
+        <h2 className='text-xl font-bold text-gray-900'>Investment</h2>
         <p className='text-3xl font-bold text-blue-600'>{score}</p>
       </div>
 
