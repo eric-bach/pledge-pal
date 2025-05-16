@@ -1,42 +1,68 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { events } from 'aws-amplify/data';
 import Image from 'next/image';
 
-interface PledgerData {
-  name: string;
-  amount: number;
-  rank: number;
+interface LeaderboardData {
+  uuid: string;
+  username: string;
+  totalScore: number;
 }
 
-const mockPledgers: PledgerData[] = [
-  { name: 'John Doe', amount: 1000, rank: 1 },
-  { name: 'Jane Smith', amount: 850, rank: 2 },
-  { name: 'Bob Johnson', amount: 750, rank: 3 },
-  { name: 'Alice Brown', amount: 600, rank: 4 },
-  { name: 'Charlie Wilson', amount: 500, rank: 5 },
-];
-
-const DUMMY_URL = 'https://pledge-pal.example.com/leaderboard';
-
 export default function Home() {
+  const [messages, setMessages] = useState<LeaderboardData[]>([]);
+
+  useEffect(() => {
+    async function handleConnect() {
+      console.log('Connecting');
+
+      return (await events.connect('/pledges/channel')).subscribe({
+        next: (data) => {
+          console.log('Received data:', data.event.data);
+          setMessages((prevMessages) => {
+            const existingIndex = prevMessages.findIndex((msg) => msg.uuid === data.event.data.uuid);
+            if (existingIndex >= 0) {
+              // Update existing entry
+              return prevMessages.map((msg, i) =>
+                i === existingIndex ? { ...msg, totalScore: data.event.data.totalScore } : msg
+              );
+            }
+            // Add new entry
+            return [...prevMessages, data.event.data];
+          });
+        },
+        error: (error) => {
+          console.error('Subscription error:', error);
+        },
+      });
+    }
+
+    handleConnect();
+  }, []);
+
   return (
     <div className='min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-3xl mx-auto'>
         <h1 className='text-4xl font-bold text-center text-gray-900 mb-8'>Task Genie Leaderboard</h1>
 
         <div className='bg-white rounded-lg shadow-xl overflow-hidden mb-8'>
-          {mockPledgers.map((pledger) => (
-            <div
-              key={pledger.rank}
-              className='flex items-center px-6 py-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'
-            >
-              <div className='flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold'>
-                {pledger.rank}
+          {messages
+            .sort((a, b) => b.totalScore - a.totalScore)
+            .map((pledger, i) => (
+              <div
+                key={pledger.uuid}
+                className='flex items-center px-6 py-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'
+              >
+                <div className='flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold'>
+                  {i + 1}
+                </div>
+                <div className='ml-4 flex-1'>
+                  <div className='text-lg font-semibold text-gray-900'>{pledger.username}</div>
+                </div>
+                <div className='text-xl font-bold text-blue-600'>${pledger.totalScore.toLocaleString()}</div>
               </div>
-              <div className='ml-4 flex-1'>
-                <div className='text-lg font-semibold text-gray-900'>{pledger.name}</div>
-              </div>
-              <div className='text-xl font-bold text-blue-600'>${pledger.amount.toLocaleString()}</div>
-            </div>
-          ))}
+            ))}
         </div>
 
         <div className='text-center'>

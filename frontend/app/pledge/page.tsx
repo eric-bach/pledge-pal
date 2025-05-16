@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { FloatingWidget } from '@/components/FloatingWidget';
-import { websocket } from '@/lib/websocket';
+// import { websocket } from '@/lib/websocket';
+import { events } from 'aws-amplify/data';
 
 // Define the widget items with rarity
 const WIDGET_ITEMS = [
@@ -67,7 +68,20 @@ export default function Pledge() {
 
   useEffect(() => {
     // Connect to WebSocket
-    websocket.connect();
+    // websocket.connect();
+    async function handleConnect() {
+      return (await events.connect('/pledges/channel')).subscribe({
+        next: (data: any) => {
+          console.log('Received data:', data);
+          //setMessages((prevMessages) => [...prevMessages, JSON.stringify(data)]);
+        },
+        error: (error: any) => {
+          console.error('Subscription error:', error);
+        },
+      });
+    }
+
+    handleConnect();
 
     // Generate widgets periodically if below maximum
     const generateWidget = () => {
@@ -112,19 +126,29 @@ export default function Pledge() {
     return () => {
       clearInterval(spawnInterval);
       clearInterval(cleanupInterval);
-      websocket.disconnect();
+      //websocket.disconnect();
     };
   }, []);
 
-  const handleCollect = (id: string, value: number) => {
+  const handleCollect = async (id: string, value: number) => {
     setScore((prev) => prev + value);
 
-    // Send to WebSocket
-    websocket.emit('collectItem', {
+    // TODO Send to WebSocket
+    // websocket.emit('collectItem', {
+    //   value,
+    //   timestamp: new Date().toISOString(),
+    //   totalScore: score + value,
+    // });
+    const uuid = localStorage.getItem('userId');
+    const username = localStorage.getItem('username');
+    const data = {
+      uuid,
+      username,
       value,
       timestamp: new Date().toISOString(),
       totalScore: score + value,
-    });
+    };
+    await events.post('pledges/channel', { data: data });
 
     // Remove only the specific widget that was clicked
     setWidgets((prev) => prev.filter((w) => w.id !== id));

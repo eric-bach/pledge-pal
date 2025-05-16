@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "aws-events-otel"
+stack_name = "pledge-pal"
 
 [default.build.parameters]
 cached = true
