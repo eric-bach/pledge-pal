@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { FloatingWidget } from '@/components/FloatingWidget';
-// import { websocket } from '@/lib/websocket';
 import { events } from 'aws-amplify/data';
 
 // Define the widget items with rarity
@@ -68,14 +67,12 @@ export default function Pledge() {
 
   useEffect(() => {
     // Connect to WebSocket
-    // websocket.connect();
     async function handleConnect() {
       return (await events.connect('/pledges/channel')).subscribe({
-        next: (data: any) => {
-          console.log('Received data:', data);
-          //setMessages((prevMessages) => [...prevMessages, JSON.stringify(data)]);
+        next: () => {
+          // console.log('Received data:', data);
         },
-        error: (error: any) => {
+        error: (error) => {
           console.error('Subscription error:', error);
         },
       });
@@ -133,12 +130,7 @@ export default function Pledge() {
   const handleCollect = async (id: string, value: number) => {
     setScore((prev) => prev + value);
 
-    // TODO Send to WebSocket
-    // websocket.emit('collectItem', {
-    //   value,
-    //   timestamp: new Date().toISOString(),
-    //   totalScore: score + value,
-    // });
+    // Send to WebSocket
     const uuid = localStorage.getItem('userId');
     const username = localStorage.getItem('username');
     const data = {
