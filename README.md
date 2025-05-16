@@ -8,19 +8,12 @@
 sam build && sam deploy --profile AWS_PROFILE
 ```
 
-2. Create a frontend/amplify_outputs.json file from the amplify_outputs.json.example file and add the properties from the backend deploy
+2. Create a frontend/.env file from the .env.example file and add the properties from the backend deploy
 
 ```
-{
-  "API": {
-    "Events": {
-      "endpoint": "",
-      "region": "",
-      "defaultAuthMode": "apiKey",
-      "apiKey": ""
-    }
-  }
-}
+NEXT_PUBLIC_APPSYNC_EVENTS_API_URL=
+NEXT_PUBLIC_APPSYNC_EVENTS_API_REGION=
+NEXT_PUBLIC_APPSYNC_EVENTS_API_KEY=
 ```
 
 3. Deploy frontend (using AWS Amplify console)
