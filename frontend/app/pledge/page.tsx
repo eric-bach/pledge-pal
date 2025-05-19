@@ -7,20 +7,32 @@ import { events } from 'aws-amplify/data';
 // Define the widget items with rarity
 const WIDGET_ITEMS = [
   {
-    imageUrl: '/images/dollar.png',
+    imageUrl: '/images/up.png',
     value: 100,
-    type: 'dollar',
-    weight: 70,
+    type: 'up',
+    weight: 50,
   },
   {
-    imageUrl: '/images/dollar-bag.png',
+    imageUrl: '/images/heart.png',
     value: 250,
-    type: 'dollar-bag',
+    type: 'heart',
     weight: 25,
   },
   {
-    imageUrl: '/images/genie.png',
+    imageUrl: '/images/money-face.png',
+    value: 500,
+    type: 'money-face',
+    weight: 15,
+  },
+  {
+    imageUrl: '/images/money-bag.png',
     value: 1000,
+    type: 'money-bag',
+    weight: 5,
+  },
+  {
+    imageUrl: '/images/genie.png',
+    value: 2500,
     type: 'token',
     weight: 5,
   },
@@ -34,11 +46,26 @@ const MIN_WIDGETS = 3;
 const WIDGET_LIFETIME = 60000; // Widget lifetime in milliseconds
 const SPAWN_INTERVAL = 8000; // New widget spawn interval in milliseconds
 
-export default function Pledge() {
+const generateRandomUsername = () => {
+  const adjectives = ['Happy', 'Clever', 'Brave', 'Swift', 'Bright', 'Witty', 'Calm', 'Eager', 'Fierce', 'Gentle'];
+  const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Fox', 'Lion', 'Wolf', 'Bear', 'Hawk', 'Dragon'];
+  const randomNum = Math.floor(Math.random() * 1000);
+
+  const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+
+  return `${randomAdj}${randomNoun}${randomNum}`;
+};
+
+export default function PledgePage() {
+  const [user, setUser] = useState({
+    uuid: localStorage.getItem('userId') ?? crypto.randomUUID(),
+    username: localStorage.getItem('username') ?? generateRandomUsername(),
+    totalScore: 0,
+  });
   const [score, setScore] = useState(0);
-  const [widgets, setWidgets] = useState<
-    Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>
-  >([]);
+  const [widgets, setWidgets] = useState<Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>>([]);
+  const [message, setMessage] = useState('');
 
   // Use a ref to maintain a counter for unique IDs
   const nextIdRef = useRef(1);
@@ -131,19 +158,36 @@ export default function Pledge() {
     setScore((prev) => prev + value);
 
     // Send to WebSocket
-    const uuid = localStorage.getItem('userId');
-    const username = localStorage.getItem('username');
     const data = {
-      uuid,
-      username,
+      uuid: user.uuid,
+      username: user.username,
       value,
       timestamp: new Date().toISOString(),
-      totalScore: score + value,
+      totalScore: user.totalScore + value,
     };
+
+    setUser((prev) => ({ ...prev, totalScore: prev.totalScore + value }));
+
     await events.post('pledges/channel', { data: data });
 
     // Remove only the specific widget that was clicked
     setWidgets((prev) => prev.filter((w) => w.id !== id));
+  };
+
+  const handleMessageSubmit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && message.trim()) {
+      // Send message to WebSocket
+      const data = {
+        uuid: user.uuid,
+        username: user.username,
+        comment: message.trim(),
+        timestamp: new Date().toISOString(),
+      };
+      await events.post('comments/channel', { data: data });
+
+      // Clear the input
+      setMessage('');
+    }
   };
 
   return (
@@ -154,22 +198,28 @@ export default function Pledge() {
         <p className='text-3xl font-bold text-blue-600'>{score}</p>
       </div>
 
+      {/* Message Input */}
+      <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4'>
+        <input
+          type='text'
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleMessageSubmit}
+          placeholder='Type your feedback and press Enter...'
+          className='w-full px-4 py-2 text-xl rounded-lg bg-white bg-opacity-50 backdrop-blur-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+        />
+      </div>
+
       {/* Floating Widgets */}
       {widgets.map((widget) => (
-        <FloatingWidget
-          key={widget.id}
-          imageUrl={widget.imageUrl}
-          value={widget.value}
-          onCollect={(value) => handleCollect(widget.id, value)}
-        />
+        <FloatingWidget key={widget.id} imageUrl={widget.imageUrl} value={widget.value} onCollect={(value) => handleCollect(widget.id, value)} />
       ))}
 
       {/* Instructions */}
-      <div className='fixed bottom-4 left-4 bg-white bg-opacity-90 rounded-lg shadow-lg p-4 max-w-sm'>
+      <div className='fixed bottom-4 left-4 bg-white bg-opacity-50 rounded-lg shadow-lg p-4 max-w-sm'>
         <h2 className='text-lg font-semibold text-gray-900 mb-2'>How to Play</h2>
         <p className='text-sm text-gray-600'>
-          Click on the floating items to collect points! Dollar signs are common, but keep an eye out for the rare and
-          valuable genie tokens!
+          Click on the floating items to share your feedback! Some signs are more common than others, keep an eye out for the rare and valuable genie tokens!
         </p>
       </div>
     </div>

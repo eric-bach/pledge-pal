@@ -24,7 +24,13 @@ Resources:
       ApiId: !GetAtt EventsApi.ApiId
       Name: pledges
 
-  PledgetPalApiKey:
+  CommentsNamespace:
+    Type: AWS::AppSync::ChannelNamespace
+    Properties:
+      ApiId: !GetAtt EventsApi.ApiId
+      Name: comments
+
+  PledgePalApiKey:
     Type: AWS::AppSync::ApiKey
     Properties:
       ApiId: !GetAtt EventsApi.ApiId
