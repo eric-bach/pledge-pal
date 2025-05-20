@@ -10,30 +10,30 @@ const WIDGET_ITEMS = [
     imageUrl: '/images/up.png',
     value: 100,
     type: 'up',
-    weight: 50,
+    weight: 40,
   },
   {
     imageUrl: '/images/heart.png',
     value: 250,
     type: 'heart',
-    weight: 25,
-  },
-  {
-    imageUrl: '/images/money-face.png',
-    value: 500,
-    type: 'money-face',
-    weight: 15,
+    weight: 30,
   },
   {
     imageUrl: '/images/money-bag.png',
-    value: 1000,
+    value: 2500,
     type: 'money-bag',
-    weight: 5,
+    weight: 15,
+  },
+  {
+    imageUrl: '/images/genie-lamp.png',
+    value: 5000,
+    type: 'genie-lamp',
+    weight: 10,
   },
   {
     imageUrl: '/images/genie.png',
-    value: 2500,
-    type: 'token',
+    value: 10000,
+    type: 'genie',
     weight: 5,
   },
 ];
@@ -68,6 +68,7 @@ export default function PledgePage() {
     Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>
   >([]);
   const [message, setMessage] = useState('');
+  const [showInstructions, setShowInstructions] = useState(true);
 
   // Initialize user data from localStorage on client-side
   useEffect(() => {
@@ -215,8 +216,8 @@ export default function PledgePage() {
   return (
     <div className='relative min-h-screen bg-gradient-to-b from-purple-100 to-blue-100 overflow-hidden'>
       {/* Score Display */}
-      <div className='fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50'>
-        <h2 className='text-xl font-bold text-gray-900'>Investment</h2>
+      <div className='fixed top-4 right-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-4 z-50'>
+        <h2 className='text-xl font-bold text-gray-900'>Score</h2>
         <p className='text-3xl font-bold text-blue-600'>{score}</p>
       </div>
 
@@ -243,13 +244,20 @@ export default function PledgePage() {
       ))}
 
       {/* Instructions */}
-      <div className='fixed bottom-4 left-4 bg-white bg-opacity-50 rounded-lg shadow-lg p-4 max-w-sm'>
-        <h2 className='text-lg font-semibold text-gray-900 mb-2'>How to Play</h2>
-        <p className='text-sm text-gray-600'>
-          Click on the floating items to share your feedback! Some signs are more common than others, keep an eye out
-          for the rare and valuable genie tokens!
-        </p>
-      </div>
+      {showInstructions && (
+        <div className='fixed bottom-4 left-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-4 max-w-sm'>
+          <div className='flex justify-between items-start mb-2'>
+            <h2 className='text-lg font-semibold text-gray-900'>How to Play</h2>
+            <button onClick={() => setShowInstructions(false)} className='text-gray-500 hover:text-gray-700'>
+              ✕
+            </button>
+          </div>
+          <p className='text-sm text-gray-600'>
+            Click on the floating items to share your feedback! Some signs are more common than others, keep an eye out
+            for the rare and valuable genie tokens!
+          </p>
+        </div>
+      )}
     </div>
   );
 }

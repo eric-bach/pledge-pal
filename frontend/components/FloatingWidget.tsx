@@ -83,14 +83,7 @@ export function FloatingWidget({ imageUrl, value, onCollect }: FloatingWidgetPro
         className='relative w-32 h-32 cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95'
         onClick={handleClick}
       >
-        <Image
-          src={imageUrl}
-          alt='Floating item'
-          width={128}
-          height={128}
-          className='object-contain'
-          draggable={false}
-        />
+        <Image src={imageUrl} alt='Floating item' width={96} height={96} className='object-contain' draggable={false} />
       </div>
     </div>
   );
