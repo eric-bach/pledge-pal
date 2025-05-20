@@ -64,7 +64,9 @@ export default function PledgePage() {
     totalScore: 0,
   });
   const [score, setScore] = useState(0);
-  const [widgets, setWidgets] = useState<Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>>([]);
+  const [widgets, setWidgets] = useState<
+    Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>
+  >([]);
   const [message, setMessage] = useState('');
 
   // Use a ref to maintain a counter for unique IDs
@@ -212,14 +214,20 @@ export default function PledgePage() {
 
       {/* Floating Widgets */}
       {widgets.map((widget) => (
-        <FloatingWidget key={widget.id} imageUrl={widget.imageUrl} value={widget.value} onCollect={(value) => handleCollect(widget.id, value)} />
+        <FloatingWidget
+          key={widget.id}
+          imageUrl={widget.imageUrl}
+          value={widget.value}
+          onCollect={(value) => handleCollect(widget.id, value)}
+        />
       ))}
 
       {/* Instructions */}
       <div className='fixed bottom-4 left-4 bg-white bg-opacity-50 rounded-lg shadow-lg p-4 max-w-sm'>
         <h2 className='text-lg font-semibold text-gray-900 mb-2'>How to Play</h2>
         <p className='text-sm text-gray-600'>
-          Click on the floating items to share your feedback! Some signs are more common than others, keep an eye out for the rare and valuable genie tokens!
+          Click on the floating items to share your feedback! Some signs are more common than others, keep an eye out
+          for the rare and valuable genie tokens!
         </p>
       </div>
     </div>
