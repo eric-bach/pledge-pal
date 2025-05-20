@@ -71,7 +71,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     async function handleScoresConnect() {
-      return (await events.connect('/pledges/channel')).subscribe({
+      return (await events.connect('/scores/channel')).subscribe({
         next: (data) => {
           console.log('Received score:', data.event.data);
           setScores((prevScores) => {
@@ -155,18 +155,18 @@ export default function LeaderboardPage() {
             <h2 className='text-2xl font-semibold text-gray-900 p-4 border-b border-gray-200'>Top Dragons</h2>
             {scores
               .sort((a, b) => b.totalScore - a.totalScore)
-              .map((pledger, i) => (
+              .map((user, i) => (
                 <div
-                  key={pledger.uuid}
+                  key={user.uuid}
                   className='flex items-center px-6 py-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'
                 >
                   <div className='flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold'>
                     {i + 1}
                   </div>
                   <div className='ml-4 flex-1'>
-                    <div className='text-lg font-semibold text-gray-900'>{pledger.username}</div>
+                    <div className='text-lg font-semibold text-gray-900'>{user.username}</div>
                   </div>
-                  <div className='text-xl font-bold text-blue-600'>${pledger.totalScore.toLocaleString()}</div>
+                  <div className='text-xl font-bold text-blue-600'>${user.totalScore.toLocaleString()}</div>
                 </div>
               ))}
           </div>

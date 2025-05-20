@@ -82,7 +82,7 @@ const ScoreLabel = ({ value, position }: { value: number; position: { x: number;
   );
 };
 
-export default function PledgePage() {
+export default function GamePage() {
   const [user, setUser] = useState({
     uuid: '',
     username: '',
@@ -123,7 +123,7 @@ export default function PledgePage() {
 
     // Connect to WebSocket
     async function handleConnect() {
-      return (await events.connect('/pledges/channel')).subscribe({
+      return (await events.connect('/scores/channel')).subscribe({
         next: () => {
           // console.log('Received data:', data);
         },
@@ -202,7 +202,7 @@ export default function PledgePage() {
       totalScore: user.totalScore + value,
     };
 
-    await events.post('pledges/channel', { data: data });
+    await events.post('scores/channel', { data: data });
 
     // Remove only the specific widget that was clicked
     setWidgets((prev) => prev.filter((w) => w.id !== id));

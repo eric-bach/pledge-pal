@@ -46,8 +46,8 @@ export default function SignupPage() {
       localStorage.setItem('userId', userId);
       localStorage.setItem('username', username);
 
-      // Navigate to pledge page
-      router.push('/pledge');
+      // Navigate to game page
+      router.push('/game');
       setIsLoading(false);
     }
   };

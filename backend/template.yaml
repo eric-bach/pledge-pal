@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  SAM Template for PledgePal AppSync Events API
+  SAM Template for Dragon's Vault AppSync Events API
 
 Resources:
   EventsApi:
     Type: AWS::AppSync::Api
     Properties:
-      Name: 'PledgePal'
+      Name: DragonsVault
       EventConfig:
         AuthProviders:
           - AuthType: API_KEY
@@ -18,11 +18,11 @@ Resources:
         DefaultSubscribeAuthModes:
           - AuthType: API_KEY
 
-  PledgesNamespace:
+  ScoresNamespace:
     Type: AWS::AppSync::ChannelNamespace
     Properties:
       ApiId: !GetAtt EventsApi.ApiId
-      Name: pledges
+      Name: scores
 
   CommentsNamespace:
     Type: AWS::AppSync::ChannelNamespace
@@ -30,7 +30,7 @@ Resources:
       ApiId: !GetAtt EventsApi.ApiId
       Name: comments
 
-  PledgePalApiKey:
+  DragonsVaultApiKey:
     Type: AWS::AppSync::ApiKey
     Properties:
       ApiId: !GetAtt EventsApi.ApiId

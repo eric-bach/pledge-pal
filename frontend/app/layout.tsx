@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'PledgePal',
+  title: "Dragon's Vault",
   description: '',
 };
 
