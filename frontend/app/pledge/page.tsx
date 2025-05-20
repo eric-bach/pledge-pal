@@ -59,8 +59,8 @@ const generateRandomUsername = () => {
 
 export default function PledgePage() {
   const [user, setUser] = useState({
-    uuid: localStorage.getItem('userId') ?? crypto.randomUUID(),
-    username: localStorage.getItem('username') ?? generateRandomUsername(),
+    uuid: '',
+    username: '',
     totalScore: 0,
   });
   const [score, setScore] = useState(0);
@@ -68,6 +68,26 @@ export default function PledgePage() {
     Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>
   >([]);
   const [message, setMessage] = useState('');
+
+  // Initialize user data from localStorage on client-side
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    const storedUsername = localStorage.getItem('username');
+
+    setUser({
+      uuid: storedUserId ?? crypto.randomUUID(),
+      username: storedUsername ?? generateRandomUsername(),
+      totalScore: 0,
+    });
+
+    // Store the generated values if they don't exist
+    if (!storedUserId) {
+      localStorage.setItem('userId', user.uuid);
+    }
+    if (!storedUsername) {
+      localStorage.setItem('username', user.username);
+    }
+  }, []);
 
   // Use a ref to maintain a counter for unique IDs
   const nextIdRef = useRef(1);
