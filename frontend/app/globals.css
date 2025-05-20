@@ -37,6 +37,17 @@
   }
 }
 
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-poof {
   animation: poof 0.5s ease-out forwards;
 }
@@ -47,6 +58,10 @@
 
 .animate-float {
   animation: float 1s ease-in-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
 }
 
 @import 'tailwindcss';

@@ -1,38 +1,39 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { FloatingWidget } from '@/components/FloatingWidget';
+import { useEffect, useState } from 'react';
+import { SendHorizontal } from 'lucide-react';
 import { events } from 'aws-amplify/data';
+import { FloatingWidget } from '@/components/FloatingWidget';
 
 // Define the widget items with rarity
 const WIDGET_ITEMS = [
   {
     imageUrl: '/images/up.png',
-    value: 100,
+    value: 1000,
     type: 'up',
     weight: 40,
   },
   {
     imageUrl: '/images/heart.png',
-    value: 250,
+    value: 2500,
     type: 'heart',
     weight: 30,
   },
   {
     imageUrl: '/images/money-bag.png',
-    value: 2500,
+    value: 5000,
     type: 'money-bag',
     weight: 15,
   },
   {
     imageUrl: '/images/genie-lamp.png',
-    value: 5000,
+    value: 10000,
     type: 'genie-lamp',
     weight: 10,
   },
   {
     imageUrl: '/images/genie.png',
-    value: 10000,
+    value: 25000,
     type: 'genie',
     weight: 5,
   },
@@ -40,7 +41,6 @@ const WIDGET_ITEMS = [
 
 // Calculate total weight for probability calculation
 const TOTAL_WEIGHT = WIDGET_ITEMS.reduce((sum, item) => sum + item.weight, 0);
-
 const MAX_WIDGETS = 15;
 const MIN_WIDGETS = 3;
 const WIDGET_LIFETIME = 60000; // Widget lifetime in milliseconds
@@ -88,45 +88,14 @@ export default function PledgePage() {
     username: '',
     totalScore: 0,
   });
-  const [score, setScore] = useState(0);
   const [widgets, setWidgets] = useState<
     Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>
   >([]);
   const [scoreLabels, setScoreLabels] = useState<
     Array<{ id: string; value: number; position: { x: number; y: number } }>
   >([]);
-  const [message, setMessage] = useState('');
+  const [userComment, setUserComment] = useState('');
   const [showInstructions, setShowInstructions] = useState(true);
-
-  // Initialize user data from localStorage on client-side
-  useEffect(() => {
-    const storedUserId = localStorage.getItem('userId');
-    const storedUsername = localStorage.getItem('username');
-
-    setUser({
-      uuid: storedUserId ?? crypto.randomUUID(),
-      username: storedUsername ?? generateRandomUsername(),
-      totalScore: 0,
-    });
-
-    // Store the generated values if they don't exist
-    if (!storedUserId) {
-      localStorage.setItem('userId', user.uuid);
-    }
-    if (!storedUsername) {
-      localStorage.setItem('username', user.username);
-    }
-  }, []);
-
-  // Use a ref to maintain a counter for unique IDs
-  const nextIdRef = useRef(1);
-
-  // Function to generate a unique ID
-  const generateUniqueId = () => {
-    const id = `widget-${Date.now()}-${nextIdRef.current}`;
-    nextIdRef.current += 1;
-    return id;
-  };
 
   // Function to get a random widget based on weight
   const getRandomWidget = () => {
@@ -144,6 +113,14 @@ export default function PledgePage() {
   };
 
   useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    const username = localStorage.getItem('username');
+    setUser({
+      uuid: userId ?? crypto.randomUUID(),
+      username: username ?? generateRandomUsername(),
+      totalScore: 0,
+    });
+
     // Connect to WebSocket
     async function handleConnect() {
       return (await events.connect('/pledges/channel')).subscribe({
@@ -165,7 +142,7 @@ export default function PledgePage() {
         if (prev.length >= MAX_WIDGETS) return prev;
 
         const randomItem = getRandomWidget();
-        return [...prev, { ...randomItem, id: generateUniqueId(), createdAt: Date.now() }];
+        return [...prev, { ...randomItem, id: crypto.randomUUID(), createdAt: Date.now() }];
       });
     };
 
@@ -191,7 +168,7 @@ export default function PledgePage() {
         // If we're below minimum, add a new widget
         if (filtered.length < MIN_WIDGETS) {
           const randomItem = getRandomWidget();
-          filtered.push({ ...randomItem, id: generateUniqueId(), createdAt: Date.now() });
+          filtered.push({ ...randomItem, id: crypto.randomUUID(), createdAt: Date.now() });
         }
 
         return filtered;
@@ -201,12 +178,11 @@ export default function PledgePage() {
     return () => {
       clearInterval(spawnInterval);
       clearInterval(cleanupInterval);
-      //websocket.disconnect();
     };
   }, []);
 
   const handleCollect = async (id: string, value: number, position: { x: number; y: number }) => {
-    setScore((prev) => prev + value);
+    setUser((prev) => ({ ...prev, totalScore: prev.totalScore + value }));
 
     // Add score label
     const labelId = `label-${Date.now()}`;
@@ -226,8 +202,6 @@ export default function PledgePage() {
       totalScore: user.totalScore + value,
     };
 
-    setUser((prev) => ({ ...prev, totalScore: prev.totalScore + value }));
-
     await events.post('pledges/channel', { data: data });
 
     // Remove only the specific widget that was clicked
@@ -235,18 +209,18 @@ export default function PledgePage() {
   };
 
   const handleMessageSubmit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && message.trim()) {
-      // Send message to WebSocket
+    if (e.key === 'Enter' && userComment.trim()) {
+      // Send comment to WebSocket
       const data = {
         uuid: user.uuid,
         username: user.username,
-        comment: message.trim(),
+        comment: userComment.trim(),
         timestamp: new Date().toISOString(),
       };
       await events.post('comments/channel', { data: data });
 
       // Clear the input
-      setMessage('');
+      setUserComment('');
     }
   };
 
@@ -255,19 +229,26 @@ export default function PledgePage() {
       {/* Score Display */}
       <div className='fixed top-4 right-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-4 z-50'>
         <h2 className='text-xl font-bold text-gray-900'>Score</h2>
-        <p className='text-3xl font-bold text-blue-600'>{score}</p>
+        <p className='text-3xl font-bold text-blue-600'>${user.totalScore.toLocaleString()}</p>
       </div>
 
       {/* Message Input */}
       <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4'>
         <input
           type='text'
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={userComment}
+          onChange={(e) => setUserComment(e.target.value)}
           onKeyDown={handleMessageSubmit}
-          placeholder='Type your feedback and press Enter...'
-          className='w-full px-4 py-2 text-xl rounded-lg bg-white bg-opacity-50 backdrop-blur-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          placeholder='Enter your feedback...'
+          className='w-full pr-12 pl-4 py-2 text-xl rounded-lg bg-white bg-opacity-50 backdrop-blur-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          style={{ position: 'relative' }}
         />
+        <button
+          onClick={() => handleMessageSubmit({ key: 'Enter' } as React.KeyboardEvent<HTMLInputElement>)}
+          className='absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+        >
+          <SendHorizontal className='w-4 h-4' />
+        </button>
       </div>
 
       {/* Score Labels */}
@@ -289,7 +270,7 @@ export default function PledgePage() {
       {showInstructions && (
         <div className='fixed bottom-4 left-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-4 max-w-sm'>
           <div className='flex justify-between items-start mb-2'>
-            <h2 className='text-lg font-semibold text-gray-900'>How to Play</h2>
+            <h2 className='text-lg font-semibold text-gray-900'>Provide your feedback</h2>
             <button onClick={() => setShowInstructions(false)} className='text-gray-500 hover:text-gray-700'>
               ✕
             </button>

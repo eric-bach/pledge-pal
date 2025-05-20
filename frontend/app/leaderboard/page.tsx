@@ -18,9 +18,56 @@ interface Comments extends User {
   timestamp: string;
 }
 
+interface Notification {
+  id: string;
+  message: string;
+  timestamp: number;
+}
+
+// Helper function to generate notification messages
+const generateNotificationMessage = (
+  username: string,
+  oldIndex: number | null,
+  newIndex: number,
+  score: number
+): string => {
+  if (oldIndex === null) {
+    return `${username} has joined the leaderboard!`;
+  }
+
+  if (newIndex < oldIndex) {
+    if (score >= 5000000) return `${username} has unlocked the Genie's golden lamp!`;
+    if (score >= 2000000) return `${username} has mastered the art of wish-making!`;
+    if (score >= 1000000) return `${username} has summoned the Genie!`;
+    if (score >= 500000) return `${username} is radiating magical energy!`;
+    if (score >= 200000) return `${username} has found a magical lamp!`;
+    if (score >= 100000) return `${username} discovered ancient treasure!`;
+    if (score >= 50000) return `${username} is on a magic carpet ride!`;
+    return `${username} is moving up the rankings!`;
+  }
+
+  if (newIndex > oldIndex) {
+    return `${username} has been overtaken!`;
+  }
+
+  return `${username} has increased their score!`;
+};
+
 export default function LeaderboardPage() {
   const [scores, setScores] = useState<Scores[]>([]);
   const [comments, setComments] = useState<Comments[]>([]);
+  const [notifications, setNotifications] = useState<Notification | undefined>(undefined);
+
+  // Function to add a notification
+  const addNotification = (message: string) => {
+    const id = crypto.randomUUID();
+    setNotifications({ id, message, timestamp: Date.now() });
+
+    // Remove notification after 2 seconds
+    setTimeout(() => {
+      setNotifications(undefined);
+    }, 2000);
+  };
 
   useEffect(() => {
     async function handleScoresConnect() {
@@ -28,15 +75,36 @@ export default function LeaderboardPage() {
         next: (data) => {
           console.log('Received score:', data.event.data);
           setScores((prevScores) => {
+            // Sort previous scores to get current positions
+            const sortedPrevScores = [...prevScores].sort((a, b) => b.totalScore - a.totalScore);
             const existingIndex = prevScores.findIndex((msg) => msg.uuid === data.event.data.uuid);
-            if (existingIndex >= 0) {
-              // Update existing entry
-              return prevScores.map((msg, i) =>
-                i === existingIndex ? { ...msg, totalScore: data.event.data.totalScore } : msg
+            const oldIndex =
+              existingIndex >= 0 ? sortedPrevScores.findIndex((s) => s.uuid === data.event.data.uuid) : null;
+
+            // Create new scores array
+            const newScores =
+              existingIndex >= 0
+                ? prevScores.map((msg, i) =>
+                    i === existingIndex ? { ...msg, totalScore: data.event.data.totalScore } : msg
+                  )
+                : [...prevScores, data.event.data];
+
+            // Sort new scores to get new position
+            const sortedNewScores = [...newScores].sort((a, b) => b.totalScore - a.totalScore);
+            const newIndex = sortedNewScores.findIndex((s) => s.uuid === data.event.data.uuid);
+
+            // Only show notification if position actually changed
+            if (oldIndex !== newIndex) {
+              const message = generateNotificationMessage(
+                data.event.data.username,
+                oldIndex,
+                newIndex,
+                data.event.data.totalScore
               );
+              addNotification(message);
             }
-            // Add new entry
-            return [...prevScores, data.event.data];
+
+            return newScores;
           });
         },
         error: (error) => {
@@ -69,7 +137,18 @@ export default function LeaderboardPage() {
   return (
     <div className='min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-3xl mx-auto'>
-        <h1 className='text-4xl font-bold text-center text-gray-900 mb-8'>Welcome to Dragon&apos;s Vault</h1>
+        {notifications && (
+          <div className='fixed top-4 left-0 right-0 z-50 flex justify-center'>
+            <div
+              key={notifications.id}
+              className='bg-white rounded-lg shadow-lg px-4 py-2 text-center animate-slide-in'
+            >
+              <p className='text-lg font-semibold text-gray-900'>{notifications.message}</p>
+            </div>
+          </div>
+        )}
+
+        <h1 className='text-4xl font-bold text-center mt-4 text-gray-900 mb-8'>Welcome to Dragon&apos;s Vault</h1>
 
         {scores.length > 0 && (
           <div className='bg-white rounded-lg shadow-xl overflow-hidden mb-8'>
