@@ -57,6 +57,31 @@ const generateRandomUsername = () => {
   return `${randomAdj}${randomNoun}${randomNum}`;
 };
 
+// Score Label Component
+const ScoreLabel = ({ value, position }: { value: number; position: { x: number; y: number } }) => {
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setOpacity(0);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div
+      className='absolute pointer-events-none transition-opacity duration-1000'
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        opacity,
+      }}
+    >
+      <div className='text-2xl font-bold text-green-500 animate-float'>+{value}</div>
+    </div>
+  );
+};
+
 export default function PledgePage() {
   const [user, setUser] = useState({
     uuid: '',
@@ -66,6 +91,9 @@ export default function PledgePage() {
   const [score, setScore] = useState(0);
   const [widgets, setWidgets] = useState<
     Array<{ id: string; type: string; value: number; imageUrl: string; createdAt: number }>
+  >([]);
+  const [scoreLabels, setScoreLabels] = useState<
+    Array<{ id: string; value: number; position: { x: number; y: number } }>
   >([]);
   const [message, setMessage] = useState('');
   const [showInstructions, setShowInstructions] = useState(true);
@@ -177,8 +205,17 @@ export default function PledgePage() {
     };
   }, []);
 
-  const handleCollect = async (id: string, value: number) => {
+  const handleCollect = async (id: string, value: number, position: { x: number; y: number }) => {
     setScore((prev) => prev + value);
+
+    // Add score label
+    const labelId = `label-${Date.now()}`;
+    setScoreLabels((prev) => [...prev, { id: labelId, value, position }]);
+
+    // Remove score label after animation
+    setTimeout(() => {
+      setScoreLabels((prev) => prev.filter((label) => label.id !== labelId));
+    }, 1000);
 
     // Send to WebSocket
     const data = {
@@ -233,13 +270,18 @@ export default function PledgePage() {
         />
       </div>
 
+      {/* Score Labels */}
+      {scoreLabels.map((label) => (
+        <ScoreLabel key={label.id} value={label.value} position={label.position} />
+      ))}
+
       {/* Floating Widgets */}
       {widgets.map((widget) => (
         <FloatingWidget
           key={widget.id}
           imageUrl={widget.imageUrl}
           value={widget.value}
-          onCollect={(value) => handleCollect(widget.id, value)}
+          onCollect={(value, position) => handleCollect(widget.id, value, position)}
         />
       ))}
 

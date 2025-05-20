@@ -4,7 +4,7 @@ import Image from 'next/image';
 interface FloatingWidgetProps {
   imageUrl: string;
   value: number;
-  onCollect: (value: number) => void;
+  onCollect: (value: number, position: { x: number; y: number }) => void;
 }
 
 export function FloatingWidget({ imageUrl, value, onCollect }: FloatingWidgetProps) {
@@ -65,7 +65,7 @@ export function FloatingWidget({ imageUrl, value, onCollect }: FloatingWidgetPro
         cancelAnimationFrame(animationFrameId.current);
       }
       setCollected(true);
-      onCollect(value);
+      onCollect(value, position);
     }
   };
 
