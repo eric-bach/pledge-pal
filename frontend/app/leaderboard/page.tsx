@@ -141,9 +141,9 @@ export default function LeaderboardPage() {
           <div className='fixed top-4 left-0 right-0 z-50 flex justify-center'>
             <div
               key={notifications.id}
-              className='bg-white rounded-lg shadow-lg px-4 py-2 text-center animate-slide-in'
+              className='bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-lg shadow-lg px-4 py-2 text-center animate-slide-in'
             >
-              <p className='text-lg font-semibold text-gray-900'>{notifications.message}</p>
+              <p className='text-lg font-semibold'>{notifications.message}</p>
             </div>
           </div>
         )}
@@ -152,7 +152,9 @@ export default function LeaderboardPage() {
 
         {scores.length > 0 && (
           <div className='bg-white rounded-lg shadow-xl overflow-hidden mb-8'>
-            <h2 className='text-2xl font-semibold text-gray-900 p-4 border-b border-gray-200'>Top Dragons</h2>
+            <h2 className='text-2xl font-semibold text-white p-4 border-b border-gray-200 bg-gradient-to-r from-[#43a49e] via-[#2fb387] to-[#10b981] shadow-md'>
+              Top Dragons
+            </h2>
             {scores
               .sort((a, b) => b.totalScore - a.totalScore)
               .map((user, i) => (
@@ -160,13 +162,13 @@ export default function LeaderboardPage() {
                   key={user.uuid}
                   className='flex items-center px-6 py-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'
                 >
-                  <div className='flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold'>
+                  <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-[#43a49e] via-[#2fb387] to-[#10b981] text-white flex items-center justify-center font-bold'>
                     {i + 1}
                   </div>
                   <div className='ml-4 flex-1'>
                     <div className='text-lg font-semibold text-gray-900'>{user.username}</div>
                   </div>
-                  <div className='text-xl font-bold text-blue-600'>${user.totalScore.toLocaleString()}</div>
+                  <div className='text-xl font-bold text-[#43a49e]'>${user.totalScore.toLocaleString()}</div>
                 </div>
               ))}
           </div>
@@ -174,7 +176,9 @@ export default function LeaderboardPage() {
 
         {comments.length > 0 && (
           <div className='bg-white rounded-lg shadow-xl overflow-hidden mb-8'>
-            <h2 className='text-2xl font-semibold text-gray-900 p-4 border-b border-gray-200'>Recent Comments</h2>
+            <h2 className='text-2xl font-semibold text-white p-4 border-b border-gray-200 bg-gradient-to-r from-[#43a49e] via-[#2fb387] to-[#10b981] shadow-md'>
+              Recent Comments
+            </h2>
             {comments
               .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
               .map((c, i) => (
