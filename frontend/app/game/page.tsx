@@ -239,6 +239,7 @@ export default function GamePage() {
           value={userComment}
           onChange={(e) => setUserComment(e.target.value)}
           onKeyDown={handleMessageSubmit}
+          maxLength={60}
           placeholder='Enter your feedback...'
           className='w-full pr-12 pl-4 py-2 text-xl rounded-lg bg-white bg-opacity-50 backdrop-blur-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
           style={{ position: 'relative' }}

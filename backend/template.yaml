@@ -7,7 +7,7 @@ Resources:
   EventsApi:
     Type: AWS::AppSync::Api
     Properties:
-      Name: DragonsVault
+      Name: dragons-vault
       EventConfig:
         AuthProviders:
           - AuthType: API_KEY
@@ -17,6 +17,27 @@ Resources:
           - AuthType: API_KEY
         DefaultSubscribeAuthModes:
           - AuthType: API_KEY
+
+  EventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: dragons-vault-events
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: TimestampIndex
+          KeySchema:
+            - AttributeName: timestamp
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
 
   ScoresNamespace:
     Type: AWS::AppSync::ChannelNamespace
@@ -29,6 +50,76 @@ Resources:
     Properties:
       ApiId: !GetAtt EventsApi.ApiId
       Name: comments
+      CodeHandlers: |
+        import * as ddb from '@aws-appsync/utils/dynamodb'
+        import { util } from '@aws-appsync/utils'
+
+        const TABLE = 'dragons-vault-events'
+
+        export const onPublish = {
+          request(ctx) {
+            const channel = ctx.info.channel.path
+            return ddb.batchPut({
+              tables: {
+                [TABLE]: ctx.events.map(({id, payload}) => {
+                  const data = payload?.data || {}
+                  const item = {
+                    id,
+                    channel,
+                    timestamp: data.timestamp || util.time.nowISO8601(),
+                    ...payload
+                  }
+                  
+                  // Only add fields if they exist
+                  if (data.uuid) item.userid = data.uuid
+                  if (data.username) item.username = data.username
+                  if (data.comment) item.comment = data.comment
+                  
+                  return item
+                }),
+              },
+            })
+          },
+          response(ctx) {
+            return ctx.result.data[TABLE].map(({ id, ...payload }) => ({ id, payload }))
+          },
+        }
+      HandlerConfigs:
+        OnPublish:
+          Behavior: CODE
+          Integration:
+            DataSourceName: !GetAtt CommentsDataSource.Name
+
+  CommentsDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt EventsApi.ApiId
+      Name: CommentsDynamoDB
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        TableName: !Ref EventsTable
+        AwsRegion: !Ref AWS::Region
+
+  AppSyncDynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:BatchWriteItem
+                Resource: !GetAtt EventsTable.Arn
 
   DragonsVaultApiKey:
     Type: AWS::AppSync::ApiKey
@@ -42,3 +133,6 @@ Outputs:
   ApiKey:
     Description: AppSync API Key
     Value: !Sub EventsApi.ApiKey
+  EventsTableName:
+    Description: DynamoDB table name for events
+    Value: !Ref EventsTable

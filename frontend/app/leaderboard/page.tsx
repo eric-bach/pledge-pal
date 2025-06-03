@@ -121,7 +121,7 @@ export default function LeaderboardPage() {
             const updatedComments = [...prevComments, data.event.data];
             return updatedComments
               .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-              .slice(0, 5);
+              .slice(0, 10);
           });
         },
         error: (error) => {
@@ -182,7 +182,7 @@ export default function LeaderboardPage() {
             {comments
               .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
               .map((c, i) => (
-                <div key={i} className='p-4 border-gray-200 last:border-0'>
+                <div key={i} className='p-2 pb-1 border-gray-200 last:border-0'>
                   <div className='flex items-center'>
                     <span className='font-semibold text-gray-900'>{c.username}:</span>
                     <p className='text-gray-700 ml-2'>&quot;{c.comment}&quot;</p>
