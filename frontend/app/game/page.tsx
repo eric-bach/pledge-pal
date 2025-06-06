@@ -233,7 +233,7 @@ export default function GamePage() {
       </div>
 
       {/* Message Input */}
-      <div className='fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4'>
+      <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4'>
         <input
           type='text'
           value={userComment}
