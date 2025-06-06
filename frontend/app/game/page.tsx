@@ -9,31 +9,31 @@ import { FloatingWidget } from '@/components/FloatingWidget';
 const WIDGET_ITEMS = [
   {
     imageUrl: '/images/up.png',
-    value: 1000,
+    value: 2000,
     type: 'up',
     weight: 40,
   },
   {
     imageUrl: '/images/heart.png',
-    value: 2000,
+    value: 5000,
     type: 'heart',
     weight: 30,
   },
   {
     imageUrl: '/images/money-bag.png',
-    value: 5000,
+    value: 10000,
     type: 'money-bag',
     weight: 20,
   },
   {
     imageUrl: '/images/genie-lamp.png',
-    value: 20000,
+    value: 50000,
     type: 'genie-lamp',
     weight: 6,
   },
   {
     imageUrl: '/images/genie.png',
-    value: 50000,
+    value: 100000,
     type: 'genie',
     weight: 4,
   },
