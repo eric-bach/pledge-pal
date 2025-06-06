@@ -61,12 +61,12 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='space-y-2'>
               <label htmlFor='username' className='block text-sm font-medium text-gray-700'>
-                Username
+                Name
               </label>
               <Input
                 id='username'
                 type='text'
-                placeholder='Enter your username'
+                placeholder='Enter your name'
                 value={username}
                 onChange={handleUsernameChange}
                 maxLength={16}
@@ -83,7 +83,7 @@ export default function SignupPage() {
               disabled={!!error || !username || isLoading}
               className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'
             >
-              $tart
+              Join
             </button>
           </form>
         </div>

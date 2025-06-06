@@ -227,13 +227,13 @@ export default function GamePage() {
   return (
     <div className='relative min-h-screen bg-gradient-to-b from-purple-100 to-blue-100 overflow-hidden'>
       {/* Score Display */}
-      <div className='fixed top-4 right-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-4 z-50'>
-        <h2 className='text-xl font-bold text-gray-900'>Score</h2>
-        <p className='text-3xl font-bold text-blue-600'>${user.totalScore.toLocaleString()}</p>
+      <div className='fixed top-4 right-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-2 z-50'>
+        <h2 className='text-lg font-bold text-gray-900'>Score</h2>
+        <p className='text-2xl font-bold text-blue-600'>${user.totalScore.toLocaleString()}</p>
       </div>
 
       {/* Message Input */}
-      <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4'>
+      <div className='fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4'>
         <input
           type='text'
           value={userComment}
@@ -269,16 +269,15 @@ export default function GamePage() {
 
       {/* Instructions */}
       {showInstructions && (
-        <div className='fixed bottom-4 left-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-4 max-w-sm'>
+        <div className='fixed bottom-4 left-4 bg-white bg-opacity-30 rounded-lg shadow-lg p-3 max-w-sm'>
           <div className='flex justify-between items-start mb-2'>
-            <h2 className='text-lg font-semibold text-gray-900'>Provide your feedback</h2>
+            <h2 className='text-md font-semibold text-gray-900'>Provide your feedback</h2>
             <button onClick={() => setShowInstructions(false)} className='text-gray-500 hover:text-gray-700'>
               ✕
             </button>
           </div>
           <p className='text-sm text-gray-600'>
-            Click on the floating items to share your feedback! Some signs are more common than others, keep an eye out
-            for the rare and valuable genie tokens!
+            Click on the floating items and share your feedback! Keep an eye out for the rare and valuable genie tokens!
           </p>
         </div>
       )}
