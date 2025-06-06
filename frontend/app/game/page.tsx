@@ -15,7 +15,7 @@ const WIDGET_ITEMS = [
   },
   {
     imageUrl: '/images/heart.png',
-    value: 2500,
+    value: 2000,
     type: 'heart',
     weight: 30,
   },
@@ -23,19 +23,19 @@ const WIDGET_ITEMS = [
     imageUrl: '/images/money-bag.png',
     value: 5000,
     type: 'money-bag',
-    weight: 15,
+    weight: 20,
   },
   {
     imageUrl: '/images/genie-lamp.png',
-    value: 10000,
+    value: 20000,
     type: 'genie-lamp',
-    weight: 10,
+    weight: 6,
   },
   {
     imageUrl: '/images/genie.png',
-    value: 25000,
+    value: 50000,
     type: 'genie',
-    weight: 5,
+    weight: 4,
   },
 ];
 
