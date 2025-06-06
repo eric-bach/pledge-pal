@@ -157,6 +157,7 @@ export default function LeaderboardPage() {
             </h2>
             {scores
               .sort((a, b) => b.totalScore - a.totalScore)
+              .slice(0, 5)
               .map((user, i) => (
                 <div
                   key={user.uuid}
