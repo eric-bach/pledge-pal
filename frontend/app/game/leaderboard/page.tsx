@@ -68,7 +68,7 @@ export default function LeaderboardPage() {
     async function handleScoresConnect() {
       return (await events.connect('/scores/channel')).subscribe({
         next: (data) => {
-          console.log('Received score:', data.event.data);
+          //console.log('Received score:', data.event.data);
           setScores((prevScores) => {
             // Sort previous scores to get current positions
             const sortedPrevScores = [...prevScores].sort((a, b) => b.totalScore - a.totalScore);
@@ -103,7 +103,7 @@ export default function LeaderboardPage() {
     async function handleCommentsConnect() {
       return (await events.connect('/comments/channel')).subscribe({
         next: (data) => {
-          console.log('Received comment:', data.event.data);
+          // console.log('Received comment:', data.event.data);
           setComments((prevComments) => {
             const updatedComments = [...prevComments, data.event.data];
             return updatedComments.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
