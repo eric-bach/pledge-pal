@@ -25,12 +25,7 @@ interface Notification {
 }
 
 // Helper function to generate notification messages
-const generateNotificationMessage = (
-  username: string,
-  oldIndex: number | null,
-  newIndex: number,
-  score: number
-): string => {
+const generateNotificationMessage = (username: string, oldIndex: number | null, newIndex: number, score: number): string => {
   if (oldIndex === null) {
     return `${username} has joined the leaderboard!`;
   }
@@ -78,15 +73,12 @@ export default function LeaderboardPage() {
             // Sort previous scores to get current positions
             const sortedPrevScores = [...prevScores].sort((a, b) => b.totalScore - a.totalScore);
             const existingIndex = prevScores.findIndex((msg) => msg.uuid === data.event.data.uuid);
-            const oldIndex =
-              existingIndex >= 0 ? sortedPrevScores.findIndex((s) => s.uuid === data.event.data.uuid) : null;
+            const oldIndex = existingIndex >= 0 ? sortedPrevScores.findIndex((s) => s.uuid === data.event.data.uuid) : null;
 
             // Create new scores array
             const newScores =
               existingIndex >= 0
-                ? prevScores.map((msg, i) =>
-                    i === existingIndex ? { ...msg, totalScore: data.event.data.totalScore } : msg
-                  )
+                ? prevScores.map((msg, i) => (i === existingIndex ? { ...msg, totalScore: data.event.data.totalScore } : msg))
                 : [...prevScores, data.event.data];
 
             // Sort new scores to get new position
@@ -95,12 +87,7 @@ export default function LeaderboardPage() {
 
             // Only show notification if position actually changed
             if (oldIndex !== newIndex) {
-              const message = generateNotificationMessage(
-                data.event.data.username,
-                oldIndex,
-                newIndex,
-                data.event.data.totalScore
-              );
+              const message = generateNotificationMessage(data.event.data.username, oldIndex, newIndex, data.event.data.totalScore);
               addNotification(message);
             }
 
@@ -119,9 +106,7 @@ export default function LeaderboardPage() {
           console.log('Received comment:', data.event.data);
           setComments((prevComments) => {
             const updatedComments = [...prevComments, data.event.data];
-            return updatedComments
-              .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-              .slice(0, 5);
+            return updatedComments.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
           });
         },
         error: (error) => {
@@ -158,10 +143,7 @@ export default function LeaderboardPage() {
             {scores
               .sort((a, b) => b.totalScore - a.totalScore)
               .map((user, i) => (
-                <div
-                  key={user.uuid}
-                  className='flex items-center p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'
-                >
+                <div key={user.uuid} className='flex items-center p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'>
                   <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-[#43a49e] via-[#2fb387] to-[#10b981] text-white flex items-center justify-center font-bold'>
                     {i + 1}
                   </div>
@@ -177,7 +159,7 @@ export default function LeaderboardPage() {
         {comments.length > 0 && (
           <div className='bg-white rounded-lg shadow-xl overflow-hidden mb-8'>
             <h2 className='text-xl font-semibold text-white p-3 border-b border-gray-200 bg-gradient-to-r from-[#43a49e] via-[#2fb387] to-[#10b981] shadow-md'>
-              Recent Comments
+              Whispers from the Lair
             </h2>
             {comments
               .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
