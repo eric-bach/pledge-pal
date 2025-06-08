@@ -142,6 +142,7 @@ export default function LeaderboardPage() {
             </h2>
             {scores
               .sort((a, b) => b.totalScore - a.totalScore)
+              .slice(0, 5)
               .map((user, i) => (
                 <div key={user.uuid} className='flex items-center p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors'>
                   <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-[#43a49e] via-[#2fb387] to-[#10b981] text-white flex items-center justify-center font-bold'>
