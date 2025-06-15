@@ -10,12 +10,13 @@ interface FloatingWidgetProps {
 export function FloatingWidget({ imageUrl, value, onCollect }: FloatingWidgetProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [collected, setCollected] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Store animation frame ID and speeds in refs
   const animationFrameId = useRef<number | null>(null);
   const speedRef = useRef({
-    x: (Math.random() - 0.5) * 3,
-    y: (Math.random() - 0.5) * 3,
+    x: (Math.random() - 0.5) * 4,
+    y: (Math.random() - 0.5) * 4,
   });
 
   const animate = useCallback(() => {
@@ -50,11 +51,17 @@ export function FloatingWidget({ imageUrl, value, onCollect }: FloatingWidgetPro
     // Start animation
     animate();
 
+    // Trigger fade-in after a small delay
+    const fadeInTimeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
     // Cleanup function
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
+      clearTimeout(fadeInTimeout);
     };
   }, [animate]);
 
@@ -76,13 +83,11 @@ export function FloatingWidget({ imageUrl, value, onCollect }: FloatingWidgetPro
       className='absolute'
       style={{
         transform: `translate(${position.x}px, ${position.y}px)`,
-        transition: 'transform 0.05s linear',
+        opacity: isVisible ? 1 : 0,
+        transition: 'opacity 0.5s ease-in-out, transform 0.05s linear',
       }}
     >
-      <div
-        className='relative w-32 h-32 cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95'
-        onClick={handleClick}
-      >
+      <div className='relative w-32 h-32 cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95' onClick={handleClick}>
         <Image src={imageUrl} alt='Floating item' width={72} height={72} className='object-contain' draggable={false} />
       </div>
     </div>
