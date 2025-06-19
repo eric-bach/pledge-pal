@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 
-export default function SignupPage() {
+export default function GamePage() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');

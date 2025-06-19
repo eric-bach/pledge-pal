@@ -82,7 +82,7 @@ const ScoreLabel = ({ value, position }: { value: number; position: { x: number;
   );
 };
 
-export default function GamePage() {
+export default function GamePlayPage() {
   const [user, setUser] = useState({
     uuid: '',
     username: '',
